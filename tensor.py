@@ -1,5 +1,11 @@
 import numpy as np
 
+class box():
+    def __init__(self, value, func, parents):
+        self.value = value
+        self.func = func
+        self.parents = parents
+
 
 class wrapped_float(float):
     def __new__(cls, value):
@@ -7,6 +13,9 @@ class wrapped_float(float):
     def __add__(self, other):
         print("Adding!")
         return wrapped_float(float.__add__(self, other))
+    def __mul__(self, other):
+        print("Multiplying!")
+        return wrapped_float(float.__mul__(self, other))
 
 # This will play the same role for np.array as float.
 # This is the class the user is expected to use most often.
@@ -60,12 +69,24 @@ def function_of_floats_wrapper(f):
         return f(*wrapped_args, **wrapped_kwargs)
     return wrapped
 
+# Takes a function of traceable arguments along with a gradient and defines a new function that 
+# the trace will not enter
+def make_primitive(f):
+    pass
+
+
 @function_of_floats_wrapper
 def f(x,y):
-    return x+y
+    z = x*y
+    #a = 5 + z # todo: Here seems to use __rmul__ of int class
+    a = z + 5
+    return a
 
-f(1,2)
-x = 5
-print(f(x, 2))
+x = wrapped_float(5)
+y = wrapped_float(6)
+x+ y
+x * y
+
+print(type(f(1,2)))
 
 
