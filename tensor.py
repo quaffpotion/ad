@@ -13,9 +13,15 @@ class wrapped_float(float):
     def __add__(self, other):
         print("Adding!")
         return wrapped_float(float.__add__(self, other))
+    def __radd__(self, other):
+        print("Adding right")
+        return wrapped_float(float.__radd__(self, other))
     def __mul__(self, other):
         print("Multiplying!")
         return wrapped_float(float.__mul__(self, other))
+    def __rmul__(self, other):
+        print("Multiplying right!")
+        return wrapped_float(float.__rmul__(self, other))
 
 # This will play the same role for np.array as float.
 # This is the class the user is expected to use most often.
