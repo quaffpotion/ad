@@ -1,6 +1,6 @@
 import numpy as np
 
-class box():
+class Box():
     def __init__(self, value, func, parents):
         self.value = value
         self.func = func
@@ -21,13 +21,15 @@ class wrapped_float(float):
         return wrapped_float(float.__mul__(self, other))
     def __rmul__(self, other):
         print("Multiplying right!")
-        return wrapped_float(float.__rmul__(self, other))
+        return wrapped_float(float.__r__(self, other))
 
 # This will play the same role for np.array as float.
 # This is the class the user is expected to use most often.
 # Note, subclassing here requires fewer zany circumlocutions 
 # than the wrapped_float class above.
 class Tensor(np.ndarray):
+
+    
     pass
 
 # Only intended for the tutorial, generally you will be using arrays
@@ -75,11 +77,17 @@ def function_of_floats_wrapper(f):
         return f(*wrapped_args, **wrapped_kwargs)
     return wrapped
 
-# Takes a function of traceable arguments along with a gradient and defines a new function that 
-# the trace will not enter
-def make_primitive(f):
-    pass
-
+# Wrap a function so it keeps track of boxed arguments
+def primitive(func):
+    def primitive_func(*args, **kwargs):
+        if any(map(lambda x: type(x).__name__ != "float", args)):
+            parents = [x for x in args if (lambda x: type(x).__name__ != "float")(x)]
+            extracted_values = [x.value if (lambda x: type(x).__name__ != "float")(x) else x for x in args]
+            value = func(*extracted_values, **kwargs)
+            return Box(value, primitive_func, parents)
+        else:
+            return func(*args, **kwargs)
+    return primitive_func
 
 @function_of_floats_wrapper
 def f(x,y):
