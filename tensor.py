@@ -3,14 +3,15 @@ import numpy as np
 # Wrap a function so it keeps track of boxed arguments
 def primitive(func):
     def primitive_func(*args, **kwargs):
-        if any(map(lambda x: type(x).__name__ not in ["wrapped_float","float"], args)):
-            parents = [x for x in args if (lambda x: type(x).__name__ not in ["wrapped_float","float"])(x)]
-            extracted_values = [x.value if (lambda x: type(x).__name__ not in ["wrapped_float","float"])(x) else x for x in args]
+        if any(map(lambda _ : isinstance(_, Box), args)):
+            parents = [_ for _ in args if isinstance(_, Box)]
+            extracted_values = [_.value if isinstance(_, Box) else _ for _ in args]
             value = func(*extracted_values, **kwargs)
             return Box(value, primitive_func, parents)
         else:
             return func(*args, **kwargs)
     return primitive_func
+
 
 # Transforms a function f: floats -> float into a function 
 # f_wrapped: wrapped_floats -> wrapped_float provided the operations 
@@ -23,16 +24,29 @@ def function_of_floats_wrapper(f):
     return wrapped
 
 
+
+
 class Box():
-    def __init__(self, value, func, parents):
+
+    #Instead of wrapping float.__add__ when creating each boxed float we wrap them all at once and then
+    #assign them when the object is initialized
+    type_mappings = {
+                    float.__add__: primitive(float.__add__), float.__mul__: primitive(float.__mul__),
+                    float.__radd__: primitive(float.__radd__), float.__rmul__: primitive(float.__rmul__),
+                    }
+    
+    def __init__(self, value, func = None, parents = []):
         self.value = value
         self.func = func
         self.parents = parents
-        self.__add__ = primitive(value.__add__)
-        self.__mul__ = primitive(value.__mul__)
-        self.__radd__ = primitive(value.__radd__)
-        self.__rmul__ = primitive(value.__rmul__)
+        #seems you can't assign a function to __add__ here that python will recognize
 
+    def __str__(self): return self.value.__str__()
+        
+    def __add__(self, other): return self.type_mappings[type(self.value).__add__](self, other)
+    def __radd__(self, other): return self.type_mappings[type(self.value).__radd__](self, other)
+    def __mul__(self, other): return self.type_mappings[type(self.value).__mul__](self, other)
+    def __rmul__(self, other): return self.type_mappings[type(self.value).__rmul__](self, other)
 
 
 class wrapped_float(float):
@@ -48,19 +62,17 @@ class wrapped_float(float):
         return wrapped_float(float.__mul__(self, other))
     
 
-x = wrapped_float(5.0)
-y = wrapped_float(6.0)
-z = wrapped_float(7.0)
+x = Box(5.0)
+y = Box(6.0)
 
-
+print(type(x+y))
+print(type(x+5.0))
+print(type(5.0+x))
 
 def f(x,y,z):
-    return y+z
+    return x*2+y*3
 
-print(type(f(5.0, Box(6.0,None,[]), 7.0)))
-print(type(Box(5.0, None, [])))
-
-
+print(Box(6.9))
 
 
 
