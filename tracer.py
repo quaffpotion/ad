@@ -1,7 +1,7 @@
-# Example behavior:
+# Takes a graph (in the form of a box computed from a function) and computes
+# the change w.r.t. the leaf nodes
 
-# f = lambda x, y: x^2 + y^2
-
-# grad should box up the argument it's trying to find the partial wrt
-# and then send it on it's way... the box will accumulate values as it goes
-#
+# note: may specialize later to assume graph has one end node and only one
+#       leaf
+def backwardpass(graph):
+    raise "Not Implemented"
