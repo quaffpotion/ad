@@ -6,10 +6,10 @@ def primitive(func):
         # note: isinstance is not the fastest way to do this, will change
         # to isBox(x) later once all mappings are written
         if any(map(lambda _ : isinstance(_, Box), args)):
-            parents = [_ for _ in args if isinstance(_, Box)]
+            parents = [_ for _ in enumerate(args) if isinstance(_[1], Box)]
             extracted_values = [_.value if isinstance(_, Box) else _ for _ in args]
             value = func(*extracted_values, **kwargs)
-            return Box(value, primitive_func, parents)
+            return Box(value, primitive_func, [parent[1] for parent in parents], extracted_values, kwargs, [parent[0] for parent in parents])
         else:
             return func(*args, **kwargs)
     return primitive_func
@@ -23,10 +23,14 @@ class Box():
                     float.__radd__: primitive(float.__radd__), float.__rmul__: primitive(float.__rmul__),
                     }
     
-    def __init__(self, value, func = None, parents = []):
+    def __init__(self, value, func = None, parents = [], args = [], kwargs = {}, parent_argnums = []):
         self.value = value
         self.func = func
-        self.parents = parents
+        self.parents = parents #Will only keep boxed parents
+        self.args = args
+        self.kwargs = kwargs
+        self.parent_argnums = parent_argnums #Keeps track of which parents go into which arguments so we can fetch derivatives
+
         #seems you can't assign a function to __add__ here that python will recognize
 
     def __str__(self): return self.value.__str__()
