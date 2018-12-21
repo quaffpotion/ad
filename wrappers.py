@@ -1,3 +1,5 @@
+from math import sin, cos, exp
+
 # Wrap a function so it keeps track of positional boxed arguments
 # (Design choice: Our library reserves keyword arguments for function 
 # variables that will not be differentiated)
@@ -14,12 +16,13 @@ def primitive(func):
             return func(*args, **kwargs)
     return primitive_func
 
+
 #Instead of wrapping float.__add__ when creating each boxed float we wrap them all at once and then
 #assign them when the object is initialized
-
 type_mappings = {
                     float.__add__: primitive(float.__add__), float.__mul__: primitive(float.__mul__),
                     float.__radd__: primitive(float.__radd__), float.__rmul__: primitive(float.__rmul__),
+                    float.__pow__: primitive(float.__pow__), float.__rpow__: primitive(float.__rpow__),
                 }
 function_deltas = {
                     type_mappings[float.__add__]:{0: lambda x, y: 1.0, 1: lambda x, y: 1.0},
@@ -49,21 +52,24 @@ class Box():
     def __rmul__(self, other): return type_mappings[type(self.value).__rmul__](self, other)
 
 
-
+#Wrap Python math operations
+sin = primitive(sin)
+cos = primitive(cos)
+exp = primitive(exp)
 
 
 #testing
 
-print(str(id(None)))
+# print(str(id(None)))
 
-print(list(map(id, list(type_mappings.values()))))
-print(list(map(id, list(function_deltas.keys()))))
-x = Box(2.0)
-y = Box(2.1)
-z = Box(2.2)
+# print(list(map(id, list(type_mappings.values()))))
+# print(list(map(id, list(function_deltas.keys()))))
+# x = Box(2.0)
+# y = Box(2.1)
+# z = Box(2.2)
 
-x + y 
-x + y
+# x + y 
+# x + y
 
 
 

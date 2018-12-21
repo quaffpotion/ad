@@ -5,13 +5,6 @@
 #leaf
 def backwardpass(last_box):
     raise NotImplementedError
-    
-    # last_box.value = 1.0
-    # queue = [last_box]
-    # while current:
-    #     current = queue.pop()
-    #     for parent in current.parents
-    #         parent.value = current.value * parent.func.delta
 
 #From Autodidact
 def toposort(end_node):

@@ -1,17 +1,27 @@
 #All the user will need to import:
 from operators import grad
-#import wrapped_numpy as np #to implement
+import wrapped_numpy as np
 
 #imports for testing
-from wrappers import Box
+from wrappers import Box, sin
 from operators import box_args
+from tracer import toposort
 
+def f(x,y,z):
+    return x*y, x*z
 
+def g(x, n):
+    for _ in range(0,n):
+        x = sin(x * 2)
+    return x
 
-def f(x,y):
-    return x*y
+for _ in toposort(g(Box(2.0),3)):
+    print(_)
 
-f(*box_args(2.,3.))
+for _ in f(Box(2.0), Box(3.0), Box(4.0)):
+    for __ in toposort(_):
+        print(__)
+        
 
 # print(grad(f)(2.,3.))
 
