@@ -14,14 +14,21 @@ def primitive(func):
             return func(*args, **kwargs)
     return primitive_func
 
-class Box():
+#Instead of wrapping float.__add__ when creating each boxed float we wrap them all at once and then
+#assign them when the object is initialized
 
-    #Instead of wrapping float.__add__ when creating each boxed float we wrap them all at once and then
-    #assign them when the object is initialized
-    type_mappings = {
+type_mappings = {
                     float.__add__: primitive(float.__add__), float.__mul__: primitive(float.__mul__),
                     float.__radd__: primitive(float.__radd__), float.__rmul__: primitive(float.__rmul__),
-                    }
+                }
+function_deltas = {
+                    type_mappings[float.__add__]:{0: lambda x, y: 1.0, 1: lambda x, y: 1.0},
+                    type_mappings[float.__radd__]:{0: lambda x, y: 1.0, 1: lambda x, y: 1.0},
+                    type_mappings[float.__mul__]:{0: lambda x, y: y, 1: lambda x, y: x},
+                    type_mappings[float.__rmul__]:{0: lambda x, y: y, 1: lambda x, y: x},
+}
+
+class Box():
     
     def __init__(self, value, func = None, parents = [], args = [], kwargs = {}, parent_argnums = []):
         self.value = value
@@ -31,11 +38,33 @@ class Box():
         self.kwargs = kwargs
         self.parent_argnums = parent_argnums #Keeps track of which parents go into which arguments so we can fetch derivatives
 
-        #seems you can't assign a function to __add__ here that python will recognize
+        # seems you can't assign a function to __add__ here that python will recognize
+        # seems to be because python checks the *class* definition for an add function
 
     def __str__(self): return self.value.__str__()
-        
-    def __add__(self, other): return self.type_mappings[type(self.value).__add__](self, other)
-    def __radd__(self, other): return self.type_mappings[type(self.value).__radd__](self, other)
-    def __mul__(self, other): return self.type_mappings[type(self.value).__mul__](self, other)
-    def __rmul__(self, other): return self.type_mappings[type(self.value).__rmul__](self, other)
+    
+    def __add__(self, other): return type_mappings[type(self.value).__add__](self, other)
+    def __radd__(self, other): return type_mappings[type(self.value).__radd__](self, other)
+    def __mul__(self, other): return type_mappings[type(self.value).__mul__](self, other)
+    def __rmul__(self, other): return type_mappings[type(self.value).__rmul__](self, other)
+
+
+
+
+
+#testing
+
+print(str(id(None)))
+
+print(list(map(id, list(type_mappings.values()))))
+print(list(map(id, list(function_deltas.keys()))))
+x = Box(2.0)
+y = Box(2.1)
+z = Box(2.2)
+
+x + y 
+x + y
+
+
+
+
