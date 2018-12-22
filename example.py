@@ -7,6 +7,14 @@ from wrappers import Box, sin
 from operators import box_args
 from tracer import toposort
 
+def f(x,y):
+        return x*y
+
+print(grad(f,0)(2.0,3.0))
+
+
+
+
 def f(x,y,z):
     return x*y, x*z
 
