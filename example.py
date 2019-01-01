@@ -6,6 +6,7 @@ import wrapped_numpy as np
 from wrappers import Box, sin
 from operators import box_args
 from tracer import toposort
+from testing import numerical_grad_operator
 
 def f(x,y,z):
         return (x*y)**z+x**(y+z)-3*z*x 
@@ -13,17 +14,20 @@ def f(x,y,z):
 print(grad(f,0)(2.0,3.0,4.0))
 print(grad(f,1)(2.0,3.0,4.0))
 print(grad(f,2)(2.0,3.0,4.0))
+print(numerical_grad_operator(f,0)(2.0,3.0,4.0))
+print(numerical_grad_operator(f,1)(2.0,3.0,4.0))
+print(numerical_grad_operator(f,2)(2.0,3.0,4.0))
 
-for _ in toposort(f(Box(2.),Box(3.),Box(4.))):
-        print(_)
+# for _ in toposort(f(Box(2.),Box(3.),Box(4.))):
+#         print(_)
 
-print()
-
-
+# print()
 
 
-def f(x,y,z):
-    return x*y, x*z
+
+
+# def f(x,y,z):
+#     return x*y, x*z
 
 # def g(x, n):
 #     for _ in range(0,n):
@@ -33,9 +37,9 @@ def f(x,y,z):
 # for _ in toposort(g(Box(2.0),3)):
 #     print(_)
 
-for _ in f(Box(2.0), Box(3.0), Box(4.0)):
-    for __ in toposort(_):
-        print(__)
+# for _ in f(Box(2.0), Box(3.0), Box(4.0)):
+#     for __ in toposort(_):
+#         print(__)
 
 # print(grad(f)(2.,3.))
 
