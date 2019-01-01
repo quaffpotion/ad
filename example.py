@@ -11,7 +11,7 @@ from testing import numerical_grad_operator
 def f(x,y,z):
         return (x*y)**z+x**(y+z)-3*z*x 
 
-print(grad(f,0)(2.0,3.0,4.0))
+print(grad(f,0)(2.0,3.0,4.0)) #3028 #copy paste into wolframalpha: evaluate partial (x*y)^z+x^(y+z)-3*z*x wrt x where x=2,y=3,z=4.0
 print(grad(f,1)(2.0,3.0,4.0))
 print(grad(f,2)(2.0,3.0,4.0))
 print(numerical_grad_operator(f,0)(2.0,3.0,4.0))
