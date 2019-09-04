@@ -1,4 +1,5 @@
 # ad
+Further minimalist version of https://github.com/mattjj/autodidact.
 
 ## Ordered Todo:
 - [x] Implement tracer.backwardpass for scalar-valued function taking gradient w.r.t one variable
